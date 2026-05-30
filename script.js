@@ -494,12 +494,17 @@
     function speakSuccess() {
       if (!('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
-      var utterance = new SpeechSynthesisUtterance(
-        'Hurray! Thank you for your submission. We will get back to you in one business day.'
-      );
-      utterance.rate  = 1;
-      utterance.pitch = 1.1;
-      window.speechSynthesis.speak(utterance);
+      // Chrome bug: synthesis can get stuck in a paused state; resume() unblocks it.
+      // setTimeout lets cancel() fully clear before queuing the new utterance.
+      setTimeout(function () {
+        var utterance = new SpeechSynthesisUtterance(
+          'Hurray! Thank you for your submission. We will get back to you in one business day.'
+        );
+        utterance.rate  = 1;
+        utterance.pitch = 1.1;
+        window.speechSynthesis.resume();
+        window.speechSynthesis.speak(utterance);
+      }, 100);
     }
 
     function showContactSuccess(formEl) {
