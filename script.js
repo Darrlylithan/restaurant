@@ -6,6 +6,7 @@
     initScrollAnimations();
     initCarousel();
     initFormValidation();
+    initContactForm();
     initCopyrightYear();
   });
 
@@ -353,6 +354,122 @@
     }
 
     // Minimal XSS-safe HTML escape for user-supplied strings inserted via innerHTML
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  }
+
+
+  /* =============================================
+     CONTACT FORM — lead capture + localStorage
+     ============================================= */
+  function initContactForm() {
+    var form          = document.getElementById('contact-form');
+    var successBanner = document.getElementById('contact-success');
+
+    if (!form || !successBanner) return;
+
+    var validators = {
+      contactName: function (val) {
+        return val.trim().length >= 2 ? '' : 'Please enter your full name (at least 2 characters).';
+      },
+      contactEmail: function (val) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim()) ? '' : 'Please enter a valid email address.';
+      },
+      contactInterest: function (val) {
+        return val ? '' : 'Please select an enquiry type.';
+      },
+      contactMessage: function (val) {
+        return val.trim().length >= 10 ? '' : 'Please enter a message (at least 10 characters).';
+      }
+    };
+
+    function validateField(input) {
+      var name    = input.name;
+      if (!validators[name]) return true;
+
+      var errorId = input.getAttribute('aria-describedby');
+      var errorEl = errorId ? document.getElementById(errorId) : null;
+      var message = validators[name](input.value);
+
+      if (message) {
+        input.classList.add('is-invalid');
+        if (errorEl) errorEl.textContent = message;
+        return false;
+      } else {
+        input.classList.remove('is-invalid');
+        if (errorEl) errorEl.textContent = '';
+        return true;
+      }
+    }
+
+    var requiredFields = form.querySelectorAll('[required]');
+    requiredFields.forEach(function (field) {
+      field.addEventListener('blur',   function () { validateField(field); });
+      field.addEventListener('input',  function () { if (field.classList.contains('is-invalid')) validateField(field); });
+      field.addEventListener('change', function () { if (field.classList.contains('is-invalid')) validateField(field); });
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      successBanner.hidden = true;
+
+      var valid = true;
+      requiredFields.forEach(function (field) {
+        if (!validateField(field)) valid = false;
+      });
+
+      if (!valid) {
+        var firstInvalid = form.querySelector('.is-invalid');
+        if (firstInvalid) firstInvalid.focus();
+        return;
+      }
+
+      saveLead(form);
+      showContactSuccess(form);
+    });
+
+    function saveLead(formEl) {
+      var lead = {
+        id:        Date.now(),
+        timestamp: new Date().toISOString(),
+        name:      formEl.querySelector('#contact-name').value.trim(),
+        email:     formEl.querySelector('#contact-email').value.trim(),
+        phone:     formEl.querySelector('#contact-phone').value.trim(),
+        company:   formEl.querySelector('#contact-company').value.trim(),
+        interest:  formEl.querySelector('#contact-interest').value,
+        message:   formEl.querySelector('#contact-message').value.trim()
+      };
+
+      try {
+        var existing = JSON.parse(localStorage.getItem('crimsonpalace_leads') || '[]');
+        existing.push(lead);
+        localStorage.setItem('crimsonpalace_leads', JSON.stringify(existing));
+      } catch (err) { /* storage unavailable — continue silently */ }
+    }
+
+    function showContactSuccess(formEl) {
+      var name     = escapeHtml(formEl.querySelector('#contact-name').value.trim());
+      var select   = formEl.querySelector('#contact-interest');
+      var category = escapeHtml(select.options[select.selectedIndex].text);
+
+      successBanner.innerHTML =
+        '<strong>Enquiry received!</strong>' +
+        'Thank you, ' + name + '! Your ' + category + ' enquiry has been received. ' +
+        'Our team will be in touch within one business day.';
+
+      successBanner.hidden = false;
+      successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      formEl.reset();
+      form.querySelectorAll('.is-invalid').forEach(function (el) { el.classList.remove('is-invalid'); });
+      form.querySelectorAll('.form-error').forEach(function (el) { el.textContent = ''; });
+    }
+
     function escapeHtml(str) {
       return String(str)
         .replace(/&/g, '&amp;')
