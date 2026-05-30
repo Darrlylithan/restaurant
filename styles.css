@@ -58,6 +58,137 @@
 
 
 /* =============================================
+   LIGHT THEME OVERRIDES
+   Apply by setting data-theme="light" on <html>
+   ============================================= */
+[data-theme="light"] {
+  --color-charcoal:        #1a0a0a;
+  --color-charcoal-mid:    #f0e6da;
+  --color-charcoal-light:  #e8d8c8;
+  --color-cream:           #faf6f0;
+  --color-cream-dark:      #f2e8da;
+  --color-cream-border:    #d4b896;
+  --color-gold:            #b01020;
+  --color-gold-light:      #cc1a30;
+  --color-gold-dim:        rgba(176, 16, 32, 0.15);
+  --color-accent-gold:     #c08a10;
+  --color-white:           #ffffff;
+  --color-text-muted:      #7a5a4a;
+  --color-error:           #8b1a1a;
+  --color-error-bg:        rgba(139, 26, 26, 0.06);
+  --color-success-bg:      #eef7ee;
+  --color-success-border:  #2e7d32;
+  --color-success-text:    #1a4d1c;
+
+  /* Shadows soften on light backgrounds */
+  --shadow-card:  0 2px 16px rgba(80, 20, 10, 0.08);
+  --shadow-hover: 0 12px 40px rgba(80, 20, 10, 0.18);
+  --shadow-nav:   0 2px 24px rgba(80, 20, 10, 0.14);
+}
+
+/* Light theme: nav transparent state uses ivory background tint */
+[data-theme="light"] #main-header {
+  background: rgba(250, 246, 240, 0.92);
+}
+
+[data-theme="light"] #main-header.nav--scrolled {
+  background: var(--color-cream);
+}
+
+/* Nav links in light theme: switch from cream to charcoal text */
+[data-theme="light"] .nav-links a {
+  color: var(--color-charcoal);
+}
+
+[data-theme="light"] .nav-links a:hover,
+[data-theme="light"] .nav-links a:focus-visible {
+  color: var(--color-gold-light);
+}
+
+/* Hamburger bars in light theme */
+[data-theme="light"] .nav-toggle__bar {
+  background: var(--color-charcoal);
+}
+
+/* Mobile nav dropdown in light theme */
+[data-theme="light"] .nav-links {
+  background: var(--color-cream);
+}
+
+[data-theme="light"] .nav-links a {
+  border-bottom-color: var(--color-cream-border);
+}
+
+/* Testimonials section in light theme: swap charcoal bg for warm ivory */
+[data-theme="light"] #testimonials {
+  background: var(--color-cream-dark);
+}
+
+[data-theme="light"] #testimonials .section-header h2,
+[data-theme="light"] #testimonials .section-subtitle {
+  color: var(--color-charcoal);
+}
+
+[data-theme="light"] .testimonial-card__quote {
+  color: var(--color-charcoal);
+}
+
+/* Contact details panel in light theme */
+[data-theme="light"] .contact__details {
+  background: var(--color-cream-dark);
+}
+
+[data-theme="light"] .contact__detail-item address,
+[data-theme="light"] .contact__detail-item p {
+  color: var(--color-charcoal);
+}
+
+[data-theme="light"] .contact__detail-item a {
+  color: var(--color-charcoal);
+}
+
+[data-theme="light"] .contact__detail-item dt {
+  color: var(--color-charcoal);
+}
+
+[data-theme="light"] .contact__detail-item dd {
+  color: var(--color-text-muted);
+}
+
+/* Footer in light theme */
+[data-theme="light"] footer {
+  background: var(--color-cream-dark);
+  color: var(--color-charcoal);
+}
+
+[data-theme="light"] .footer__desc {
+  color: var(--color-text-muted);
+}
+
+[data-theme="light"] footer address,
+[data-theme="light"] footer address a,
+[data-theme="light"] footer dt,
+[data-theme="light"] footer dd {
+  color: var(--color-charcoal);
+}
+
+[data-theme="light"] .footer__bottom {
+  border-top-color: var(--color-cream-border);
+  color: var(--color-text-muted);
+}
+
+/* Dish cards stay white; explicit token ensures consistency */
+[data-theme="light"] .dish-card {
+  background: var(--color-white);
+}
+
+/* Section header h2 text in light theme */
+[data-theme="light"] .section-header h2 {
+  color: var(--color-charcoal);
+}
+
+
+/* =============================================
    RESET & BASE
    ============================================= */
 *, *::before, *::after {
@@ -309,6 +440,62 @@ address {
 .nav-links a:focus-visible::after {
   transform: scaleX(1);
   transform-origin: left;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--color-cream);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  transition: border-color var(--ease-base), color var(--ease-base), background var(--ease-base), transform var(--ease-base);
+  line-height: 1;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  transform: scale(1.1);
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+/* In light mode the nav is light so swap border/icon colours */
+[data-theme="light"] .theme-toggle {
+  border-color: rgba(26, 10, 10, 0.3);
+  color: var(--color-charcoal);
+}
+
+[data-theme="light"] .theme-toggle:hover,
+[data-theme="light"] .theme-toggle:focus-visible {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+/* Hide the icon that does NOT apply to the current theme */
+.theme-toggle .icon-moon { display: block; }
+.theme-toggle .icon-sun  { display: none;  }
+
+[data-theme="light"] .theme-toggle .icon-moon { display: none;  }
+[data-theme="light"] .theme-toggle .icon-sun  { display: block; }
+
+/* Nav actions wrapper (theme toggle + hamburger) */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
 /* Hamburger */

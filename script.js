@@ -2,6 +2,7 @@
   'use strict';
 
   document.addEventListener('DOMContentLoaded', function () {
+    initThemeToggle();
     initNav();
     initScrollAnimations();
     initCarousel();
@@ -9,6 +10,44 @@
     initContactForm();
     initCopyrightYear();
   });
+
+
+  /* =============================================
+     THEME TOGGLE — light / dark preference
+     ============================================= */
+  function initThemeToggle() {
+    var btn  = document.getElementById('theme-toggle');
+    var html = document.documentElement;
+
+    if (!btn) return;
+
+    // Read saved preference; default to dark
+    var saved = 'dark';
+    try {
+      saved = localStorage.getItem('theme') || 'dark';
+    } catch (err) { /* storage unavailable */ }
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        html.dataset.theme = 'light';
+        btn.setAttribute('aria-pressed', 'true');
+      } else {
+        delete html.dataset.theme;
+        btn.setAttribute('aria-pressed', 'false');
+      }
+    }
+
+    applyTheme(saved);
+
+    btn.addEventListener('click', function () {
+      var current = html.dataset.theme === 'light' ? 'light' : 'dark';
+      var next    = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      try {
+        localStorage.setItem('theme', next);
+      } catch (err) { /* storage unavailable */ }
+    });
+  }
 
 
   /* =============================================
