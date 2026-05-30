@@ -491,6 +491,17 @@
       } catch (err) { /* storage unavailable — continue silently */ }
     }
 
+    function speakSuccess() {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      var utterance = new SpeechSynthesisUtterance(
+        'Hurray! Thank you for your submission. We will get back to you in one business day.'
+      );
+      utterance.rate  = 1;
+      utterance.pitch = 1.1;
+      window.speechSynthesis.speak(utterance);
+    }
+
     function showContactSuccess(formEl) {
       var name     = escapeHtml(formEl.querySelector('#contact-name').value.trim());
       var select   = formEl.querySelector('#contact-interest');
@@ -503,6 +514,8 @@
 
       successBanner.hidden = false;
       successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      speakSuccess();
 
       formEl.reset();
       form.querySelectorAll('.is-invalid').forEach(function (el) { el.classList.remove('is-invalid'); });
